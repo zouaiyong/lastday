@@ -448,6 +448,8 @@
       savePitfalls([]);
     });
     updatePitProgress(checked);
+    document.getElementById('nav-pit-count').textContent =
+      document.querySelectorAll('#pitfalls-list input[type="checkbox"]').length;
   }
 
   function updatePitProgress(checked) {

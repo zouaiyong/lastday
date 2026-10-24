@@ -53,13 +53,22 @@ body {
 }
 .brand h1 { font-size: 18px; margin: 0; line-height: 1.2; }
 .brand p { margin: 0; font-size: 12px; color: var(--muted); }
-.main-nav { display: flex; gap: 4px; flex-wrap: wrap; }
+.main-nav { display: flex; gap: 8px; flex-wrap: wrap; }
 .nav-btn {
-  border: none; background: transparent; color: var(--muted);
-  font-size: 14px; padding: 8px 14px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--bg);
+  color: var(--ink); font-size: 14px; font-weight: 500;
+  padding: 8px 14px; border-radius: 999px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
 }
-.nav-btn:hover { background: var(--brand-soft); color: var(--brand); }
-.nav-btn.active { background: var(--brand); color: var(--brand-ink); }
+.nav-btn:hover { border-color: var(--brand); background: var(--brand-soft); color: var(--brand); }
+.nav-btn.active { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+.nav-badge {
+  min-width: 18px; height: 18px; padding: 0 5px;
+  border-radius: 999px; background: var(--danger); color: #fff;
+  font-size: 11px; font-weight: 600; line-height: 18px;
+  display: inline-block; text-align: center;
+}
+.nav-btn.active .nav-badge { background: #fff; color: var(--brand); }
 
 /* ---------- 布局 ---------- */
 main { max-width: 960px; margin: 0 auto; padding: 20px 16px 48px; }
