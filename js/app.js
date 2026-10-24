@@ -7,6 +7,7 @@
 
   var state = { scenario: null, notice: 'no', note: '' };
   var quizStack = ['q1'];
+  var quizAnswers = {};
   var parsedLines = [];
 
   /* ---------------- 向导问答定义 ---------------- */
@@ -110,7 +111,8 @@
     var node = QUIZ[key];
     var html = '<div class="quiz-q">' + node.q + '</div><div class="quiz-opts">';
     node.opts.forEach(function (opt, i) {
-      html += '<button type="button" class="quiz-opt" data-i="' + i + '">' + opt.t + '</button>';
+      var sel = quizAnswers[key] === i ? ' selected' : '';
+      html += '<button type="button" class="quiz-opt' + sel + '" data-i="' + i + '">' + opt.t + '</button>';
     });
     html += '</div>';
     if (quizStack.length > 1) {
@@ -120,7 +122,10 @@
     quiz.innerHTML = html;
     quiz.querySelectorAll('.quiz-opt').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        var opt = node.opts[parseInt(btn.dataset.i, 10)];
+        var i = parseInt(btn.dataset.i, 10);
+        quizAnswers[key] = i;
+        btn.classList.add('selected');
+        var opt = node.opts[i];
         if (opt.next) { quizStack.push(opt.next); renderQuiz(); }
         else setScenario(opt.set || {});
       });
@@ -167,6 +172,7 @@
       state.scenario = null; state.note = '';
       box.hidden = true;
       quizStack = ['q1'];
+      quizAnswers = {};
       renderQuiz();
       saveStore();
     });

@@ -180,6 +180,19 @@ input:focus, select:focus, textarea:focus {
   border-radius: 10px; padding: 12px 14px; cursor: pointer;
 }
 .quiz-opt:hover { border-color: var(--brand); background: var(--brand-soft); }
+.quiz-opt.selected {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 500;
+}
+.quiz-opt.selected::after {
+  content: "✓ 已选";
+  float: right;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--brand);
+}
 .quiz-back { margin-top: 8px; }
 .manual-mode { margin-top: 18px; font-size: 14px; }
 .manual-mode summary { cursor: pointer; color: var(--muted); }
