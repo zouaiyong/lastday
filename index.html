@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LastDay · 裁员补偿谈判助手</title>
+<meta name="description" content="被裁了别急着签字：算清 N / N+1 / 2N，看懂法律依据，避开 HR 的坑。数据全程本地计算，不上传。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">LD</div>
+    <div>
+      <h1>LastDay</h1>
+      <p>裁员补偿谈判助手</p>
+    </div>
+  </div>
+  <nav class="main-nav" id="main-nav" aria-label="主导航">
+    <button class="nav-btn active" data-page="calc">补偿计算</button>
+    <button class="nav-btn" data-page="pitfalls">坑点自查</button>
+    <button class="nav-btn" data-page="laws">法条速查</button>
+    <button class="nav-btn" data-page="about">关于</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ============ 补偿计算 ============ -->
+<section id="page-calc" class="page active">
+  <div class="privacy-note">🔒 所有数据仅在你的浏览器本地计算与保存，不会上传任何服务器。</div>
+
+  <ol class="steps" id="steps">
+    <li class="step active" data-step="1"><span class="step-num">1</span>解除定性</li>
+    <li class="step" data-step="2"><span class="step-num">2</span>工资基数</li>
+    <li class="step" data-step="3"><span class="step-num">3</span>结果与话术</li>
+  </ol>
+
+  <!-- 步骤 1：定性 -->
+  <div class="step-panel card" id="step-1">
+    <h2>这次离职是怎么发生的？</h2>
+    <p class="muted">如实作答，工具会判定适用 N / N+1 / 2N。定性直接决定金额，拿不准的可在结果页对比测算。</p>
+    <div id="quiz"></div>
+
+    <details class="manual-mode">
+      <summary>高级：手动选择解除情形</summary>
+      <div class="field">
+        <label for="manual-scenario">解除情形</label>
+        <select id="manual-scenario"></select>
+      </div>
+      <div class="field" id="manual-notice-wrap" hidden>
+        <label for="manual-notice">是否提前30日书面通知（无过失性辞退时）</label>
+        <select id="manual-notice">
+          <option value="no">未提前通知（+1个月代通知金）</option>
+          <option value="yes">已提前30日通知</option>
+        </select>
+      </div>
+    </details>
+
+    <div id="qual-result" class="qual-result" hidden></div>
+
+    <div class="step-actions">
+      <button class="btn primary" id="next-1">下一步：算工资基数 →</button>
+    </div>
+  </div>
+
+  <!-- 步骤 2：工资基数 -->
+  <div class="step-panel card" id="step-2" hidden>
+    <div class="panel-head">
+      <h2>月均工资基数构成</h2>
+      <button class="btn ghost" id="demo-fill" type="button">载入示例数据</button>
+    </div>
+    <p class="muted">全部填<strong>税前应发</strong>（未扣社保、公积金、个税之前的数字）。点每项旁的「?」看什么算、什么不算。<a href="#" id="toggle-wage-ref">完整的计入 / 不计入清单</a></p>
+
+    <div id="wage-ref" class="wage-ref" hidden>
+      <div class="wage-ref-col">
+        <h3>✅ 计入基数</h3>
+        <ul id="wage-include-list"></ul>
+      </div>
+      <div class="wage-ref-col">
+        <h3>❌ 不计入</h3>
+        <ul id="wage-exclude-list"></ul>
+      </div>
+      <p class="muted small">口径依据：《劳动合同法实施条例》第27条、国家统计局《关于工资总额组成的规定》第4条。</p>
+    </div>
+
+    <div class="wage-grid">
+      <div class="field">
+        <div class="label-row"><label for="w-fixed">固定工资 / 月</label><button type="button" class="help-btn" data-help="fixed" aria-label="查看计入说明">?</button></div>
+        <input type="number" id="w-fixed" data-store min="0" step="100" placeholder="如 18000（基本＋岗位）">
+        <div class="hint" id="hint-fixed" hidden></div>
+      </div>
+      <div class="field">
+        <div class="label-row"><label for="w-perf">绩效·奖金 / 月</label><button type="button" class="help-btn" data-help="perf" aria-label="查看计入说明">?</button></div>
+        <input type="number" id="w-perf" data-store min="0" step="100" placeholder="如 3000（季度奖÷3、提成）">
+        <div class="hint" id="hint-perf" hidden></div>
+      </div>
+      <div class="field">
+        <div class="label-row"><label for="w-allow">津贴补贴 / 月</label><button type="button" class="help-btn" data-help="allow" aria-label="查看计入说明">?</button></div>
+        <input type="number" id="w-allow" data-store min="0" step="100" placeholder="如 1200（餐补/交通/住房/通讯）">
+        <div class="hint" id="hint-allow" hidden></div>
+      </div>
+      <div class="field">
+        <div class="label-row"><label for="w-ot">过去12个月加班费（总额）</label><button type="button" class="help-btn" data-help="ot" aria-label="查看计入说明">?</button></div>
+        <input type="number" id="w-ot" data-store min="0" step="100" placeholder="如 9600（有的月没有就不算，填合计）">
+        <div class="hint" id="hint-ot" hidden></div>
+      </div>
+      <div class="field">
+        <div class="label-row"><label for="w-other">其他货币性收入 / 月</label><button type="button" class="help-btn" data-help="other" aria-label="查看计入说明">?</button></div>
+        <input type="number" id="w-other" data-store min="0" step="100" placeholder="如 0">
+        <div class="hint" id="hint-other" hidden></div>
+      </div>
+      <div class="field">
+        <div class="label-row"><label for="w-bonus">过去12个月发放的年终奖（总额）</label><button type="button" class="help-btn" data-help="bonus" aria-label="查看计入说明">?</button></div>
+        <input type="number" id="w-bonus" data-store min="0" step="1000" placeholder="如 66000（自动÷12摊入）">
+        <div class="hint" id="hint-bonus" hidden></div>
+      </div>
+      <div class="field">
+        <div class="label-row"><label for="w-months">计算月数</label><button type="button" class="help-btn" data-help="months" aria-label="查看说明">?</button></div>
+        <input type="number" id="w-months" data-store min="1" max="12" step="1" value="12">
+        <div class="hint" id="hint-months" hidden></div>
+      </div>
+    </div>
+
+    <details class="paste-box">
+      <summary>📋 粘贴工资流水，自动归类（可选）</summary>
+      <p class="muted small">每行一条记录，含金额即可，日期和月份会被自动忽略。例如：</p>
+      <pre class="paste-example">2026-09-15 代发工资 21,500.00
+8月 工资 21500
+Q3季度奖 9000
+交通补贴 800</pre>
+      <p class="warn-inline">⚠️ 银行流水是<strong>税后到手</strong>，法定基数是<strong>税前应发</strong>：解析结果只能作下限参考，请用工资条或「个人所得税APP → 收入纳税明细」的应发数据校准。</p>
+      <textarea id="paste-input" rows="7" placeholder="把工资条 / 银行流水按行粘贴到这里…"></textarea>
+      <div class="paste-actions">
+        <button class="btn" id="paste-parse" type="button">解析</button>
+        <span class="muted small">解析后可逐条修改归类，再一键应用到上面。</span>
+      </div>
+      <div id="paste-result"></div>
+    </details>
+
+    <h3 class="sub-head">工龄与其他参数</h3>
+    <div class="wage-grid">
+      <div class="field">
+        <label for="d-start">入职日期</label>
+        <input type="date" id="d-start" data-store>
+      </div>
+      <div class="field">
+        <label for="d-end">离职日期（或最后工作日）</label>
+        <input type="date" id="d-end" data-store>
+      </div>
+      <div class="field">
+        <div class="label-row"><label for="p-annual">本年度未休年假（天，0–15）</label><button type="button" class="help-btn" data-help="annual" aria-label="查看日工资口径说明">?</button></div>
+        <input type="number" id="p-annual" data-store min="0" max="15" step="1" placeholder="如 5">
+        <div class="hint" id="hint-annual" hidden></div>
+      </div>
+      <div class="field">
+        <label for="p-annual-paid">已折算支付的年假金额（元，选填）</label>
+        <input type="number" id="p-annual-paid" data-store min="0" step="100" placeholder="公司已按正常工资折算进工资的金额">
+      </div>
+      <div class="field">
+        <label for="p-bonus">上年度年终奖水平（用于今年折算估算）</label>
+        <input type="number" id="p-bonus" data-store min="0" step="1000" placeholder="如 66000">
+      </div>
+      <div class="field">
+        <label for="p-lastmonth">离职上一个月工资（元，选填）</label>
+        <input type="number" id="p-lastmonth" data-store min="0" step="100" placeholder="代通知金基数，不填按月均估算">
+      </div>
+      <div class="field">
+        <label for="p-social">当地上年度月社平工资（元，选填）</label>
+        <input type="number" id="p-social" data-store min="0" step="100" placeholder="用于3倍封顶校验">
+      </div>
+    </div>
+
+    <div class="step-actions">
+      <button class="btn" data-goto="1" type="button">← 上一步</button>
+      <button class="btn primary" id="next-2" type="button">下一步：看结果 →</button>
+    </div>
+  </div>
+
+  <!-- 步骤 3：结果 -->
+  <div class="step-panel card" id="step-3" hidden>
+    <h2>测算结果</h2>
+    <div class="field offer-field">
+      <label for="input-offer">公司方案总金额（元）</label>
+      <input type="number" id="input-offer" data-store min="0" step="1000" placeholder="填公司口头或协议里的总包，自动算差额">
+    </div>
+    <div id="result-body"></div>
+
+    <div id="congrats-wrap" hidden></div>
+
+    <div id="statement-wrap">
+      <h2>谈判话术 / 异议函</h2>
+      <p class="muted">按你的数据自动生成，可自行修改【】中的内容后复制使用。</p>
+      <textarea id="statement" rows="14" spellcheck="false"></textarea>
+    </div>
+
+    <div class="step-actions no-print">
+      <button class="btn" data-goto="2" type="button">← 上一步</button>
+      <button class="btn" id="copy-statement" type="button">复制话术</button>
+      <button class="btn primary" id="print-result" type="button">打印 / 存为 PDF</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 坑点自查 ============ -->
+<section id="page-pitfalls" class="page" hidden>
+  <h2>裁员被坑点自查</h2>
+  <p class="muted">24 个高频坑，逐条打勾排查。勾选状态保存在本机浏览器。</p>
+  <div class="progress-wrap">
+    <div class="progress"><div class="progress-bar" id="pit-progress-bar"></div></div>
+    <span class="muted small" id="pit-progress-text">已排查 0 / 0</span>
+  </div>
+  <div id="pitfalls-list"></div>
+  <div class="step-actions"><button class="btn ghost" id="pit-reset" type="button">重置勾选</button></div>
+</section>
+
+<!-- ============ 法条速查 ============ -->
+<section id="page-laws" class="page" hidden>
+  <h2>法条速查</h2>
+  <p class="muted">原文为核心摘录，白话解释帮助理解；正式维权请以官方全文为准。</p>
+  <div id="laws-list"></div>
+</section>
+
+<!-- ============ 关于 ============ -->
+<section id="page-about" class="page" hidden>
+  <h2>关于 LastDay</h2>
+  <div class="card about-card">
+    <h3>这是什么</h3>
+    <p>一个帮被裁员工算清经济补偿（N / N+1 / 2N）、看懂法律依据、避开 HR 常见话术坑的免费工具。希望你在「last day」拿到每一分应得的钱。</p>
+    <h3>隐私</h3>
+    <p>纯前端静态页面，所有计算在浏览器本地完成，输入内容只保存在你本机的 localStorage，<strong>不联网、不上传、无统计埋点</strong>。</p>
+    <h3>实用提示</h3>
+    <ul>
+      <li>查应发工资：个人所得税APP →「收入纳税明细查询」，比银行流水（税后）更接近法定口径。</li>
+      <li>查当地社平工资：搜索「XX市 上年度职工月平均工资」，用于3倍封顶判断。</li>
+      <li>劳动仲裁免费，时效1年；已签“协商解除协议”后仍可主张欺诈 / 重大误解 / 显失公平撤销。</li>
+      <li>谈判全程可以录音（自己参与的对话），微信记录、工资条、考勤都留好。</li>
+    </ul>
+    <h3>免责声明</h3>
+    <p>本工具内容依据《劳动合同法》等公开法律法规整理，仅供参考，<strong>不构成法律意见</strong>。各地裁判口径存在差异，重大争议请咨询当地劳动仲裁机构或专业律师。</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>LastDay · 裁员补偿谈判助手 —— 仅供参考，不构成法律意见。重大争议请咨询劳动仲裁机构或律师。</p>
+  <p><button class="link-btn" id="clear-data" type="button">清空本机保存的数据</button></p>
+</footer>
+
+<script src="js/rules.js"></script>
+<script src="js/wage.js"></script>
+<script src="js/calc.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
