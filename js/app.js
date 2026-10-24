@@ -125,6 +125,8 @@
       btn.addEventListener('click', function () {
         var i = parseInt(btn.dataset.i, 10);
         quizAnswers[key] = i;
+        /* 同一题只允许一项高亮：先清掉所有兄弟选项的选中态 */
+        quiz.querySelectorAll('.quiz-opt').forEach(function (b) { b.classList.remove('selected'); });
         btn.classList.add('selected');
         var opt = node.opts[i];
         if (opt.next) { quizStack.push(opt.next); renderQuiz(); }
