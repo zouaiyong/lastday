@@ -89,6 +89,7 @@
       gotoStep(2);
     });
     document.getElementById('next-2').addEventListener('click', function () { gotoStep(3); });
+    document.getElementById('resign-to-step2').addEventListener('click', function () { gotoStep(2); });
     document.querySelectorAll('[data-goto]').forEach(function (b) {
       b.addEventListener('click', function () { gotoStep(parseInt(b.dataset.goto, 10)); });
     });
@@ -143,10 +144,18 @@
     saveStore();
   }
 
+  function updateStep1Nav() {
+    var isResign = state.scenario === 'resign';
+    document.getElementById('next-1').hidden = isResign;
+    document.getElementById('resign-note').hidden = !isResign;
+  }
+
   function renderQualResult() {
     var box = document.getElementById('qual-result');
+    updateStep1Nav();
     if (!state.scenario) { box.hidden = true; return; }
     var cfg = LayoffRules.SCN[state.scenario];
+    box.classList.toggle('warn', state.scenario === 'resign');
     var cites = cfg.laws.map(function (id) { return LayoffRules.LAWS[id].cite; }).join('、');
     var html = '<div>初步定性：<strong>' + cfg.label + '</strong><span class="std-badge">' + cfg.std + '</span></div>' +
       '<p class="qual-brief">' + cfg.brief + (state.note ? '<br>' + state.note : '') + '</p>' +
@@ -170,7 +179,7 @@
     });
     document.getElementById('quiz-restart').addEventListener('click', function () {
       state.scenario = null; state.note = '';
-      box.hidden = true;
+      renderQualResult();
       quizStack = ['q1'];
       quizAnswers = {};
       renderQuiz();
