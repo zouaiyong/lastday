@@ -170,8 +170,9 @@ Q3季度奖 9000
         <input type="number" id="p-bonus" data-store min="0" step="1000" placeholder="如 66000">
       </div>
       <div class="field">
-        <label for="p-lastmonth">离职上一个月工资（元，选填）</label>
+        <div class="label-row"><label for="p-lastmonth">离职上一个月工资（元，选填）</label><button type="button" class="help-btn" data-help="lastmonth" aria-label="查看代通知金口径说明">?</button></div>
         <input type="number" id="p-lastmonth" data-store min="0" step="100" placeholder="代通知金基数，不填按月均估算">
+        <div class="hint" id="hint-lastmonth" hidden></div>
       </div>
       <div class="field">
         <label for="p-social">当地上年度月社平工资（元，选填）</label>
