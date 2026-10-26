@@ -232,6 +232,28 @@
     });
   }
 
+  function initCitySocial() {
+    var sel = document.getElementById('p-city');
+    LayoffRules.CITY_SOCIAL.forEach(function (c) {
+      var o = document.createElement('option');
+      o.value = c.val;
+      o.textContent = c.name + '（' + LayoffCalc.fmt(c.val) + '）';
+      sel.appendChild(o);
+    });
+    sel.addEventListener('change', function () {
+      var hint = document.getElementById('hint-city');
+      if (!sel.value) {
+        hint.hidden = true;
+        return;
+      }
+      var c = LayoffRules.CITY_SOCIAL[sel.selectedIndex - 1];
+      document.getElementById('p-social').value = sel.value;
+      hint.innerHTML = '已填入 <b>' + LayoffCalc.money(sel.value) + '</b>（' + c.note + '）。仅作3倍封顶参考：各地封顶口径可能不同，如当地人社部门另有公布，请手动修改此值。';
+      hint.hidden = false;
+      saveStore();
+    });
+  }
+
   function initDemo() {
     document.getElementById('demo-fill').addEventListener('click', function () {
       if (!state.scenario) setScenario({ scenario: 'negotiate' });
@@ -541,6 +563,7 @@
     renderQuiz();
     initManual();
     initWageHelp();
+    initCitySocial();
     initDemo();
     initPaste();
     initResultActions();
